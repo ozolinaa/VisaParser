@@ -2,10 +2,11 @@
 # https://docs.docker.com/docker-cloud/builds/push-images/
 --Client
 docker login --username=xtonyx
-docker tag visaparser xtonyx/visaparser:v2
-docker push xtonyx/visaparser:v2
+docker tag visaparser xtonyx/visaparser:v3
+docker push xtonyx/visaparser:v3
 
 --Server
-docker stop visaParser
-docker rm visaParser
-docker run -d --restart=unless-stopped --name visaParser xtonyx/visaparser
+docker run -d --restart=unless-stopped -e 'utcHourToSendLog=6' -e 'interviewRequired=true' -e 'emails=anton.ozolin@gmail.com azhmurkova@gmail.com angubenko@gmail.com' --name visaParser xtonyx/visaparser:v3
+# docker stop visaParser
+# docker rm visaParser
+# docker rmi $(docker images -a -q)

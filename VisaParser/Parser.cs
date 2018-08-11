@@ -10,8 +10,9 @@ namespace VisaParser
 {
     class Parser
     {
-        public static bool HasMskPlaces(string url, bool withInterview, out string parcedValue)
+        public static bool HasMskPlaces(bool withInterview, out string parcedValue)
         {
+            string url = "http://www.gofortravel.ru/usa/visa/application/our-help/latest-news";
             byte[] response;
             using (HttpClient http = new HttpClient())
             {

@@ -11,19 +11,18 @@ namespace VisaParser
         {
             Console.OutputEncoding = Encoding.UTF8;
 
-            const int hourToSendLog = 20;
-            string[] emails = new string[] { "anton.ozolin@gmail.com", "azhmurkova@gmail.com", "angubenko@gmail.com" };
-            List<string> logItems = new List<string>();
-            DateTime lastSentLogTime = DateTime.MinValue;
+            int utcHourToSendLog = Convert.ToInt32(Environment.GetEnvironmentVariable("utcHourToSendLog"));
+            IEnumerable<string> emails = Environment.GetEnvironmentVariable("emails").Split(' ');
+            bool interviewRequired = Convert.ToBoolean(Environment.GetEnvironmentVariable("interviewRequired"));
+
+            Logger logger = new Logger(utcHourToSendLog, emails);
 
             while (true)
             {
                 try
                 {
-                    bool hasPlaces = Parser.HasMskPlaces("http://www.gofortravel.ru/usa/visa/application/our-help/latest-news", true, out string parsedString);
-                    string logItem = string.Format("{0} Status: {1} : {2}", DateTime.Now.ToShortTimeString(), hasPlaces.ToString(), parsedString);
-                    Console.WriteLine(logItem);
-                    logItems.Add(logItem);
+                    bool hasPlaces = Parser.HasMskPlaces(interviewRequired, out string parsedString);
+                    logger.Log(string.Format("UTC {0} Status: {1} : {2}", DateTime.UtcNow.ToShortTimeString(), hasPlaces.ToString(), parsedString));
 
                     if (hasPlaces)
                     {
@@ -31,33 +30,27 @@ namespace VisaParser
                         {
                             foreach (string email in emails)
                             {
-                                notifier.SendEmail(email, "MSK VISA PLACE !!!", logItem);
+                                notifier.SendEmail(email, "MSK VISA PLACE !!!", "MSK VISA PLACE AVAILABLE !!!");
                             }
                         }
                     }
                 }
                 catch (Exception e)
                 {
-                    string logItem = string.Format("{0} Error: {1}", DateTime.Now.ToShortTimeString(), e.Message);
-                    Console.WriteLine(logItem);
-                    logItems.Add(logItem);
+                    logger.Log(string.Format("UTC {0} Error: {1}", DateTime.Now.ToShortTimeString(), e.Message));
                 }
 
-
-                DateTime now = DateTime.Now;
-                if (now.Hour == hourToSendLog && (now - lastSentLogTime).Hours > 1)
+                try
                 {
-                    string logMsg = string.Join("<br />", logItems);
-                    logItems = new List<string>();
-                    using (Notifier notifier = new Notifier())
+                    if (logger.IsNowTimeToSendLog())
                     {
-                        foreach (string email in emails)
-                        {
-                            notifier.SendEmail(email, "MSK VISA LOG", logMsg);
-                        }
+                        logger.SendLogedItems();
                     }
-                    lastSentLogTime = now;
                 }
+                catch (Exception)
+                {
+                }
+
 
                 //Wait 1 minute untill next run
                 Task.Delay(1000 * 60 * 1).Wait();
