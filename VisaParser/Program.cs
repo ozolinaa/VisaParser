@@ -14,8 +14,7 @@ namespace VisaParser
             const int hourToSendLog = 20;
             string[] emails = new string[] { "anton.ozolin@gmail.com", "azhmurkova@gmail.com", "angubenko@gmail.com" };
             List<string> logItems = new List<string>();
-
-
+            DateTime lastSentLogTime = DateTime.MinValue;
 
             while (true)
             {
@@ -46,7 +45,6 @@ namespace VisaParser
 
 
                 DateTime now = DateTime.Now;
-                DateTime lastSentLogTime = DateTime.MinValue;
                 if (now.Hour == hourToSendLog && (now - lastSentLogTime).Hours > 1)
                 {
                     string logMsg = string.Join("<br />", logItems);
