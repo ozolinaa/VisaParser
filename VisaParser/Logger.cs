@@ -27,7 +27,7 @@ namespace VisaParser
         public bool IsNowTimeToSendLog()
         {
             DateTime now = DateTime.UtcNow;
-            return (now.Hour == _utcHourToSendLog && (now - _lastSentLogUTCTime).Hours > 1);
+            return (now.Hour == _utcHourToSendLog && (now - _lastSentLogUTCTime).TotalHours > 1);
         }
 
         public void SendLogedItems()
