@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "VisaParser": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "emails": "anton.ozolin@gmail.com",
+        "utcHourToSendLog": "19",
+        "interviewRequired": "false"
+      }
+    }
+  }
+}
